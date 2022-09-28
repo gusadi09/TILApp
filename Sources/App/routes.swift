@@ -21,4 +21,9 @@ func routes(_ app: Application) throws {
 	app.get("api", "acronyms") { req -> EventLoopFuture<[Acronym]> in
 		Acronym.query(on: req.db).all()
 	}
+
+	app.get("api", "acronyms", ":acronymID") { req -> EventLoopFuture<Acronym> in
+		Acronym.find(req.parameters.get("acronymID"), on: req.db)
+			.unwrap(or: Abort(.notFound))
+	}
 }
