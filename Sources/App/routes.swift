@@ -26,4 +26,22 @@ func routes(_ app: Application) throws {
 		Acronym.find(req.parameters.get("acronymID"), on: req.db)
 			.unwrap(or: Abort(.notFound))
 	}
+
+	app.put("api", "acronyms", ":acronymID") { req -> EventLoopFuture<Acronym> in
+		let updatedAcronym = try req.content.decode(Acronym.self)
+
+		return Acronym.find(
+			req.parameters.get("acronymID"),
+			on: req.db
+		)
+		.unwrap(or: Abort(.notFound))
+		.flatMap { acronym in
+			acronym.short = updatedAcronym.short
+			acronym.long = updatedAcronym.long
+
+			return acronym.save(on: req.db).map {
+				acronym
+			}
+		}
+	}
 }
