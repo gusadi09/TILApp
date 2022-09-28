@@ -44,4 +44,16 @@ func routes(_ app: Application) throws {
 			}
 		}
 	}
+
+	app.delete("api", "acronyms", ":acronymID") { req -> EventLoopFuture<HTTPStatus> in
+		Acronym.find(
+			req.parameters.get("acronymID"),
+			on: req.db
+		)
+		.unwrap(or: Abort(.notFound))
+		.flatMap { acronym in
+			acronym.delete(on: req.db)
+				.transform(to: .noContent)
+		}
+	}
 }
