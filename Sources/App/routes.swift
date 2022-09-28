@@ -62,8 +62,12 @@ func routes(_ app: Application) throws {
 			throw Abort(.badRequest)
 		}
 
-		return Acronym.query(on: req.db)
-			.filter(\.$short == searchTerm)
+		return Acronym
+			.query(on: req.db)
+			.group(.or) { or in
+				or.filter(\.$short == searchTerm)
+				or.filter(\.$long == searchTerm)
+			}
 			.all()
 	}
 }
