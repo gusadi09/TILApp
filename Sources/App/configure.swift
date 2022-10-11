@@ -20,6 +20,10 @@ public func configure(_ app: Application) throws {
 
 	try app.autoMigrate().wait()
 
+	let acronymsController = AcronymsController()
+
+	try app.register(collection: acronymsController)
+
     // register routes
     try routes(app)
 }
