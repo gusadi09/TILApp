@@ -17,6 +17,7 @@ struct AcronymsController: RouteCollection {
 		acronymsGroupRoute.put(":acronymID", use: updateHandler)
 		acronymsGroupRoute.get(":acronymID", use: getSingleHandler)
 		acronymsGroupRoute.delete(":acronymID", use: deleteHandler)
+		acronymsGroupRoute.get("search", use: searchHandler)
 	}
 
 	func getAllHandler(_ req: Request) -> EventLoopFuture<[Acronym]> {
@@ -63,5 +64,16 @@ struct AcronymsController: RouteCollection {
 			acronym.delete(on: req.db)
 				.transform(to: .noContent)
 		}
+	}
+
+	func searchHandler(_ req: Request) throws -> EventLoopFuture<[Acronym]> {
+		guard let searchTerm = req.query[String.self, at: "term"] else {
+			throw Abort(.badRequest)
+		}
+
+		return Acronym.query(on: req.db).group(.or) { or in
+			or.filter(\.$short == searchTerm)
+			or.filter(\.$long == searchTerm)
+		}.all()
 	}
 }
