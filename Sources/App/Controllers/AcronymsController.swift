@@ -15,6 +15,7 @@ struct AcronymsController: RouteCollection {
 		acronymsGroupRoute.get(use: getAllHandler)
 		acronymsGroupRoute.post(use: createHandler)
 		acronymsGroupRoute.put(":acronymID", use: updateHandler)
+		acronymsGroupRoute.get(":acronymID", use: getSingleHandler)
 	}
 
 	func getAllHandler(_ req: Request) -> EventLoopFuture<[Acronym]> {
@@ -41,5 +42,13 @@ struct AcronymsController: RouteCollection {
 
 			return acronym.save(on: req.db).map { acronym }
 		}
+	}
+
+	func getSingleHandler(_ req: Request) throws -> EventLoopFuture<Acronym> {
+		Acronym.find(
+			req.parameters.get("acronymID"),
+			on: req.db
+		)
+		.unwrap(or: Abort(.notFound))
 	}
 }
