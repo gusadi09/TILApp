@@ -10,7 +10,9 @@ import Fluent
 
 struct AcronymsController: RouteCollection {
 	func boot(routes: Vapor.RoutesBuilder) throws {
-		routes.get("api", "acronyms", use: getAllHandler)
+		let acronymsGroupRoute = routes.grouped("api", "acronyms")
+
+		acronymsGroupRoute.get(use: getAllHandler)
 	}
 
 	func getAllHandler(_ req: Request) -> EventLoopFuture<[Acronym]> {
